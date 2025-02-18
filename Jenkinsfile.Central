@@ -1,0 +1,5 @@
+@Library('jenkins-library-functions@master') _
+
+standardCentralBuild {
+  javaVersion = 'java17'
+}

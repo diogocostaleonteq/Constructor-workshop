@@ -1,0 +1,49 @@
+syntax = "proto2";
+
+package com.leonteq.constructor.workshop.api;
+
+message LoginRequest {
+    optional string nickname = 1;
+}
+
+enum LoginState {
+    OK = 1;
+    ERROR = 2;
+    NICKNAME_NOT_AVAILABLE = 3;
+}
+
+message LoginResponse {
+    optional LoginState login_state = 1;
+    optional string login_message = 2;
+    optional int32 keep_alive_interval_seconds = 3;
+}
+
+message LogoutRequest {
+    optional string nickname = 1;
+}
+
+message LogoutResponse {
+}
+
+
+message OnlineUsersUpdate {
+    repeated string nickname = 1;
+}
+
+
+message ChatMessageRequest {
+    optional string nickname = 1;
+    optional string message = 2;
+}
+
+message ChatMessageResponse {
+    optional string error_message = 1;
+}
+
+message ChatUpdate {
+    optional int64 timestamp = 1;
+    optional string nickname = 2;
+    optional string message = 3;
+}
+
+

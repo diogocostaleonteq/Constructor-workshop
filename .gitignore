@@ -1,0 +1,13 @@
+target
+.bsp
+workspace.xml
+project/boot
+test-output
+out
+.idea/*
+.idea_modules/*
+!.idea/runConfigurations
+!.idea/inspectionProfiles
+!.idea/encodings.xml
+!.idea/projectCodeStyle.xml
+.history
