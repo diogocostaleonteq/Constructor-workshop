@@ -9,6 +9,8 @@ The server handles login, logout, and chat message requests, while the client in
 ## Project Structure
 
 - `src/main/scala/com/leonteq/workshop/chat/client/ChatClientToolkit.scala`: Contains the client toolkit for handling login, logout, and chat message requests.
+- `src/main/scala/com/leonteq/workshop/chat/client/ChatClientMain.scala`: Main entry point for starting the chat client.
+- `src/main/scala/com/leonteq/workshop/chat/server/ChatServerToolkit.scala`: Contains the server toolkit for handling login, logout, and chat message requests.
 - `src/main/scala/com/leonteq/workshop/chat/server/StartConstructorWorkshop.scala`: Main entry point for starting the chat server.
 - `src/main/scala/com/leonteq/workshop/chat/server/handlers`: Where the Login/Logout/ChatMessage handlers are implemented.
 
