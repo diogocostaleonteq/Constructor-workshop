@@ -22,21 +22,12 @@ This project is a chat application built using Scala and SBT. It consists of a c
 
 ### Running the Server
 
-1. Open a terminal and navigate to the project directory.
-2. Run the following command to start the server:
-
-    ```sh
-    sbt "runMain com.leonteq.workshop.chat.server.StartConstructorWorkshop"
-    ```
+Use the provided run configuration to start the server by selecting `StartConstructorWorkshop` and clicking the run button.
 
 ### Running the Client
 
-1. Open another terminal and navigate to the project directory.
-2. Run the following command to start the client:
-
-    ```sh
-    sbt "runMain com.leonteq.workshop.chat.client.ChatClientMain"
-    ```
+Use the provided run configuration to start the client by selecting `ChatClientMain#` and clicking the run button.
+You can create more client running configurations by duplicating the existing one and changing the client name number.
 
 You can open multiple terminal windows and run the client command in each to simulate multiple clients.
 

@@ -14,7 +14,6 @@ import com.leonteq.workshop.chat.server.handlers.ChatRequestHandler
 import com.leonteq.workshop.chat.server.handlers.LoginRequestHandler
 import com.leonteq.workshop.chat.server.handlers.LogoutRequestHandler
 import com.leonteq.workshop.config.ConstructorWorkshopConfig
-import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 
 class StartConstructorWorkshopCore
@@ -24,8 +23,6 @@ class StartConstructorWorkshopCore
     ) {
 
   private val toolkitResource: Resource[IO, ChatServerToolkit] = Resource.eval(IO(new ChatServerToolkit))
-
-  private val onlineUsers = mutable.ArrayBuffer[String]()
 
   override def useBlockingAsCompute: Boolean = true
 
@@ -37,7 +34,7 @@ class StartConstructorWorkshopCore
 
   override def clients: List[LeonteqClientToolkit] = Nil
 
-  private val healthCheckResource: Resource[IO, Unit] = toolkitResource.flatMap { toolkit =>
+  private def healthCheckResource(onlineUsers: List[String]): Resource[IO, Unit] = toolkitResource.flatMap { toolkit =>
     Resource.eval(IO.delay(toolkit.registerHealthCheck("constructor-workshop-server", 30.seconds) { () =>
       if (onlineUsers.size > 10) Unhealthy("Too many online users") else Healthy
     }))
@@ -46,11 +43,11 @@ class StartConstructorWorkshopCore
   protected override def runService: ServiceStarterContext => IO[Unit] =
     _ =>
       (for {
-        _   <- toolkitResource
-        log <- createLogger[IO].toResource
-        _   <- healthCheckResource
-        _   <- log.info("Health check registered").toResource
-        _   <- log.info("Constructor Workshop is up and running").toResource
+        toolkit <- toolkitResource
+        log     <- createLogger[IO].toResource
+        _       <- healthCheckResource(toolkit.onlineUsers.toList)
+        _       <- log.info("Health check registered").toResource
+        _       <- log.info("Constructor Workshop is up and running").toResource
       } yield ()).use(_ => IO.never)
 
 }
