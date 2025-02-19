@@ -13,8 +13,10 @@ import com.leonteq.service.modules.Unhealthy
 import com.leonteq.workshop.chat.server.handlers.ChatRequestHandler
 import com.leonteq.workshop.chat.server.handlers.LoginRequestHandler
 import com.leonteq.workshop.chat.server.handlers.LogoutRequestHandler
+import com.leonteq.workshop.chat.server.service.UserService
 import com.leonteq.workshop.config.ConstructorWorkshopConfig
 import scala.concurrent.duration.DurationInt
+import scala.jdk.CollectionConverters._
 
 class StartConstructorWorkshopCore
     extends ServiceStarter[ConstructorWorkshopConfig, Any, LeonteqServerToolkit, LeonteqClientToolkit](
@@ -43,11 +45,11 @@ class StartConstructorWorkshopCore
   protected override def runService: ServiceStarterContext => IO[Unit] =
     _ =>
       (for {
-        toolkit <- toolkitResource
-        log     <- createLogger[IO].toResource
-        _       <- healthCheckResource(toolkit.onlineUsers.toList)
-        _       <- log.info("Health check registered").toResource
-        _       <- log.info("Constructor Workshop is up and running").toResource
+        _   <- toolkitResource
+        log <- createLogger[IO].toResource
+        _   <- healthCheckResource(UserService.onlineUsers.asScala.toList)
+        _   <- log.info("Health check registered").toResource
+        _   <- log.info("Constructor Workshop is up and running").toResource
       } yield ()).use(_ => IO.never)
 
 }

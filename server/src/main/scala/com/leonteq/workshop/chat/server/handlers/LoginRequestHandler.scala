@@ -8,11 +8,13 @@ import com.leonteq.constructor.workshop.api.chat_api.LoginRequest
 import com.leonteq.constructor.workshop.api.chat_api.LoginResponse
 import com.leonteq.constructor.workshop.api.chat_api.LoginState
 import com.leonteq.constructor.workshop.api.chat_api.OnlineUsersUpdate
+import com.leonteq.workshop.chat.server.service.UserService
 import com.leonteq.workshop.chat.server.validators.UsernameValidator
 import com.leonteq.workshop.chat.server.validators.UsernameValidator.UsernameTakenError
 import com.leonteq.workshop.chat.server.ChatServerToolkit
 import com.typesafe.scalalogging.StrictLogging
 import javax.inject.Inject
+import scala.jdk.CollectionConverters._
 
 class LoginRequestHandler @Inject() (toolkit: ChatServerToolkit)
     extends ScalaPbHandler[LoginRequest, LoginResponse]
@@ -21,17 +23,17 @@ class LoginRequestHandler @Inject() (toolkit: ChatServerToolkit)
   override def handle(request: LoginRequest): IO[LoginResponse] =
     (for {
       _              <- IO(logger.info(s"LoginRequestHandler handle login request $request"))
-      username       <- request.nickname.orMissing[IO]("LogoutRequest.userName")
-      onlineUsers     = toolkit.onlineUsers
+      username       <- request.nickname.orMissing[IO]("LogoutRequest.nickname")
+      onlineUsers     = UserService.onlineUsers
       messageProducer = toolkit.messageProducer
       errors         <- handleUsernameValidation(username)
       state           = responseState(errors)
-      _              <- IO(if (state == LoginState.OK) onlineUsers.addOne(username))
-      _              <- IO(messageProducer.sendMessage(OnlineUsersUpdate(onlineUsers.toSeq)))
+      _              <- IO(if (state == LoginState.OK) onlineUsers.add(username))
+      _              <- IO(messageProducer.sendMessage(OnlineUsersUpdate(onlineUsers.asScala.toList)))
     } yield LoginResponse(Some(state))).handleErrorWith(_ => IO.pure(LoginResponse(Some(LoginState.ERROR))))
 
   private def handleUsernameValidation(username: String): IO[List[String]] = {
-    val validator = new UsernameValidator(toolkit.onlineUsers.toList)
+    val validator = new UsernameValidator(UserService.onlineUsers.asScala.toList)
     for {
       validationResult <- validator.apply(username)
       errors            = validationResult.getObjectErrors("LoginRequest").map(_.defaultMessage)

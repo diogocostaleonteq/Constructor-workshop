@@ -41,18 +41,19 @@ case class ChatServerClient(toolkit: ChatClientToolkit) extends Publisher with S
       }(toolkit.executionContext)
   }
 
-  def sendMessage(nickname: String, message: String): Unit = {
-    val request = ChatMessageRequest(Some(nickname), Some(message))
-    toolkit
-      .chatMessageClient
-      .call(request)
-      .onComplete {
-        case Success(_)         =>
-          logger.info(s"Message sent: $message")
-        case Failure(exception) =>
-          publish(TransmissionError(exception.getMessage))
-      }(toolkit.executionContext)
-  }
+  def sendMessage(nickname: String, message: String): Unit =
+    if (message.nonEmpty) {
+      val request = ChatMessageRequest(Some(nickname), Some(message))
+      toolkit
+        .chatMessageClient
+        .call(request)
+        .onComplete {
+          case Success(_)         =>
+            logger.info(s"Message sent: $message")
+          case Failure(exception) =>
+            publish(TransmissionError(exception.getMessage))
+        }(toolkit.executionContext)
+    }
 
   private def loginErrorMessage(state: Option[LoginState]) = state match {
     case Some(LoginState.NICKNAME_NOT_AVAILABLE) => "Nickname already in use"
